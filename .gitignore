@@ -1,0 +1,12 @@
+bin/**/*
+!bin/data/
+
+obj/**/*
+!obj/Release/addons/
+
+*.depend
+*.layout
+*.rc
+
+*.dll
+*.exe
