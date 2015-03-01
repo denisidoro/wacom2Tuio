@@ -5,7 +5,7 @@
 
 #include "ofxWacomFeelMultiTouch.h"
 #include "ofxTuioServer.h"
-#include <vector>
+//#include "../obj/Release/addons/ofxGestures/ofxGestures.h"
 
 //--------------------------------------------------------------
 class ofApp : public ofBaseApp
@@ -20,8 +20,6 @@ class ofApp : public ofBaseApp
 		void touchDown(ofTouchEventArgs & touch);
 		void touchMoved(ofTouchEventArgs & touch);
 		void touchUp(ofTouchEventArgs & touch);
-		//void touchDoubleTap(ofTouchEventArgs & touch);
-		//void touchCancelled(ofTouchEventArgs & touch)
 
 		void keyPressed(int key);
 		void keyReleased(int key);
@@ -34,10 +32,12 @@ class ofApp : public ofBaseApp
 		void gotMessage(ofMessage msg);
 
 		ofxWacomFeelMultiTouch wacomTablet;
-		int maxFingers, fingersCount;
-		Finger* fingers;
+		int maxFingers;
 
         ofxTuioServer myTuioServer;
         TuioCursor* cursors[16] = {0};
+
+        vector<string> arguments;
+        bool verbose;
 
 };

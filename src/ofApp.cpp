@@ -4,7 +4,7 @@
 void ofApp::setup() {
 
 	ofBackground(0, 0, 0);
-	ofSetLogLevel(OF_LOG_VERBOSE);
+	//ofSetLogLevel(OF_LOG_VERBOSE);
 
 	wacomTablet.init(true);
 	wacomTablet.listAttachedDevices();
@@ -13,14 +13,12 @@ void ofApp::setup() {
 	ofAddListener(ofEvents().touchUp, this, &ofApp::touchUp);
 	ofAddListener(ofEvents().touchMoved, this, &ofApp::touchMoved);
 
-	maxFingers = 16;
-	fingers = new Finger[maxFingers];
-	for (int i = 0; i < maxFingers; i++) {
-		fingers[i].active = false;
-		fingers[i].angle  = 0.0f;
-	}
+	string domain = (arguments.size() > 1) ? arguments.at(1) : "127.0.0.1";
+	int port = (arguments.size() > 2) ? atoi(arguments.at(2).c_str()) : 3333;
+    verbose = (arguments.size() > 3) ? arguments.at(3) == "true" : true;
+	ofLogNotice() << "Sending data to " << domain << ":" << port;
 
-	myTuioServer.start("127.0.0.1", 3333);
+	myTuioServer.start(&domain[0u], port);
 	myTuioServer.setVerbose(true);
 
 }
@@ -33,99 +31,54 @@ void ofApp::update(){
 }
 
 //--------------------------------------------------------------
-void ofApp::draw() {
-
-	float dimensionScale = 1.0f;
-
-	for (int i = 0; i < maxFingers; i++) {
-		if (fingers[i].active) {
-
-			// Scale the width and height up a little bit
-			float tmpW = fingers[i].dimensions.x*dimensionScale*ofGetWidth();
-			float tmpH = fingers[i].dimensions.y*dimensionScale*ofGetHeight();
-
-			ofVec2f screenPos;
-			screenPos.set(fingers[i].pos.x*ofGetWidth(), fingers[i].pos.y*ofGetHeight());
-			ofSetColor(fingers[i].color);
-			ofEllipse(screenPos, tmpW, tmpH);
-			ofSetColor(255,255,255);
-
-		}
-	}
-
-}
+void ofApp::draw() {}
 
 //--------------------------------------------------------------
 void ofApp::touchDown(ofTouchEventArgs & touch) {
 
-	if (touch.id < maxFingers) {
-		int i = touch.id;
-		fingers[i].active = true;
-		fingers[i].angle  = 0.0f;
-		fingers[i].color.setHsb(ofRandom(255.0f), 255.0f, 255.0f);
-		ofLogNotice() << touch.x << ", " << touch.y;
-        cursors[i] = myTuioServer.addCursor(touch.x*ofGetWidth(), touch.y*ofGetHeight());
-	}
+    if (verbose) ofLogNotice() << "Touchdown\t" << touch.id << "\t(" << touch.x << ", " << touch.y << ")";
+    cursors[touch.id] = myTuioServer.addCursor(touch.x*ofGetWidth(), touch.y*ofGetHeight());
 
 }
 
 //--------------------------------------------------------------
 void ofApp::touchMoved(ofTouchEventArgs & touch) {
 
-	if (touch.id < maxFingers) {
-		int i = touch.id;
-		fingers[i].pos.set(touch.x, touch.y);
-		fingers[i].dimensions.set( touch.width, touch.height );
-		fingers[i].angle  = touch.angle;
-        myTuioServer.updateCursor(cursors[i], touch.x*ofGetWidth(), touch.y*ofGetHeight());
-	}
+    //ofLogNotice() << touch.x << ", " << touch.y;
+    myTuioServer.updateCursor(cursors[touch.id], touch.x*ofGetWidth(), touch.y*ofGetHeight());
 
 }
 
 //--------------------------------------------------------------
 void ofApp::touchUp(ofTouchEventArgs & touch) {
 
-	if (touch.id < maxFingers) {
-		int i = touch.id;
-		fingers[i].active = false;
-        myTuioServer.removeCursor(cursors[i]);
-	}
+    if (verbose) ofLogNotice() << "Touchup\t" << touch.id << "\t(" << touch.x << ", " << touch.y << ")";
+    myTuioServer.removeCursor(cursors[touch.id]);
 
 }
-
+//--------------------------------------------------------------
+void ofApp::keyPressed(int key) {}
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key) {
-}
+void ofApp::keyReleased(int key) {}
 
 //--------------------------------------------------------------
-void ofApp::keyReleased(int key) {
-}
+void ofApp::mouseMoved(int x, int y) {}
 
 //--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ) {
-}
+void ofApp::mouseDragged(int x, int y, int button) {}
 
 //--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button) {
-}
+void ofApp::mousePressed(int x, int y, int button) {}
 
 //--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button) {
-}
+void ofApp::mouseReleased(int x, int y, int button) {}
 
 //--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button) {
-}
+void ofApp::windowResized(int w, int h) {}
 
 //--------------------------------------------------------------
-void ofApp::windowResized(int w, int h) {
-}
+void ofApp::gotMessage(ofMessage msg) {}
 
 //--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg) {
-}
-
-//--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo) {
-}
+void ofApp::dragEvent(ofDragInfo dragInfo) {}
